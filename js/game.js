@@ -34,7 +34,8 @@ var hero = {
 	speed: 256 // movement in pixels per second
 };
 var monster = {};
-var monstersCaught = 0;
+var monstersPoint = 0;
+var heroPoint = 0;
 
 // Handle keyboard controls
 var keysDown = {};
@@ -49,8 +50,8 @@ addEventListener("keyup", function (e) {
 
 // Reset the game when the player catches a monster
 var reset = function () {
-	hero.x = canvas.width / 2;
-	hero.y = canvas.height / 2;
+	hero.x =  32 + (Math.random() * (canvas.width - 64));
+	hero.y = 32 + (Math.random() * (canvas.height - 64));
 
 	// Throw the monster somewhere on the screen randomly
 	monster.x = 32 + (Math.random() * (canvas.width - 64));
@@ -59,6 +60,7 @@ var reset = function () {
 
 // Update game objects
 var update = function (modifier) {
+	//Move Hero
 	if (38 in keysDown) { // Player holding up
 		hero.y -= hero.speed * modifier;
 	}
@@ -72,6 +74,24 @@ var update = function (modifier) {
 		hero.x += hero.speed * modifier;
 	}
 
+	//Move Monster
+	if (87 in keysDown) { // Player holding up
+		monster.y -= hero.speed * modifier;
+	}
+	if (83 in keysDown) { // Player holding down
+		monster.y += hero.speed * modifier;
+	}
+	if (65 in keysDown) { // Player holding left
+		monster.x -= hero.speed * modifier;
+	}
+	if (68 in keysDown) { // Player holding right
+		monster.x += hero.speed * modifier;
+	}
+
+	if (67 in keysDown) { // Player holding right
+		console.log(hero.x);
+	}
+
 	// Are they touching?
 	if (
 		hero.x <= (monster.x + 32)
@@ -79,7 +99,20 @@ var update = function (modifier) {
 		&& hero.y <= (monster.y + 32)
 		&& monster.y <= (hero.y + 32)
 	) {
-		++monstersCaught;
+		++monstersPoint;
+		reset();
+	}
+
+	//is Hero going outside the bodundary
+	else if(hero.x > canvas.width-25 || hero.x < 0 || hero.y > canvas.height-25 || hero.y < 0)
+	{
+		monstersPoint++;
+		reset();
+	}
+	//is monster going outside the bodundary
+	else if(monster.x > canvas.width-25 || monster.x < 0 || monster.y > canvas.height-25 || monster.y < 0)
+	{
+		heroPoint++;
 		reset();
 	}
 };
@@ -103,7 +136,8 @@ var render = function () {
 	ctx.font = "24px Helvetica";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	ctx.fillText("Monsters hunted: " + monstersCaught, 32, 32);
+	ctx.fillText("Monster: " + monstersPoint, 32, 32);
+	ctx.fillText("Hero: " + heroPoint, 350, 32);
 };
 
 // The main game loop
